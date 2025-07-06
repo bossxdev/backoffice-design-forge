@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ProductLimitTable from './ProductLimitTable';
 import BulkAddModal from './BulkAddModal';
 import { Button } from '@/components/ui/button';
-import { Plus, Upload } from 'lucide-react';
+import { Plus } from 'lucide-react';
 
 const ProductLimitManager = () => {
   const [showBulkModal, setShowBulkModal] = useState(false);
@@ -29,13 +29,6 @@ const ProductLimitManager = () => {
         >
           <Plus className="w-4 h-4 mr-2" />
           เพิ่มสินค้าเข้ากลุ่มลิมิต
-        </Button>
-        <Button 
-          variant="outline"
-          onClick={() => setShowBulkModal(true)}
-        >
-          <Upload className="w-4 h-4 mr-2" />
-          เพิ่มแบบหลายรายการ
         </Button>
       </div>
 
