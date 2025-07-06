@@ -93,7 +93,7 @@ const ProductLimitTable = () => {
             <SelectValue placeholder="กลุ่มจำนวนลิมิตสินค้า" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">ทั้งหมด</SelectItem>
+            <SelectItem value="all">ทั้งหมด</SelectItem>
             {limitGroups.map(group => (
               <SelectItem key={group} value={group}>{group}</SelectItem>
             ))}
@@ -105,7 +105,7 @@ const ProductLimitTable = () => {
             <SelectValue placeholder="กลุ่มจำนวนลิมิตสินค้าตามรอบ" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">ทั้งหมด</SelectItem>
+            <SelectItem value="all">ทั้งหมด</SelectItem>
             {roundGroups.map(group => (
               <SelectItem key={group} value={group}>{group}</SelectItem>
             ))}
