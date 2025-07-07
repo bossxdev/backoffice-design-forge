@@ -9,10 +9,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Copy, Trash2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
+import { ProductLimit } from '@/types/product';
 
 interface BulkAddModalProps {
   open: boolean;
   onClose: () => void;
+  onSave: (products: ProductLimit[]) => void;
 }
 
 interface ProductRow {
@@ -22,7 +24,7 @@ interface ProductRow {
   roundGroup: string;
 }
 
-const BulkAddModal = ({ open, onClose }: BulkAddModalProps) => {
+const BulkAddModal = ({ open, onClose, onSave }: BulkAddModalProps) => {
   const [activeTab, setActiveTab] = useState('table');
   const [bulkText, setBulkText] = useState('');
   const [rows, setRows] = useState<ProductRow[]>([
@@ -99,8 +101,28 @@ const BulkAddModal = ({ open, onClose }: BulkAddModalProps) => {
       return;
     }
 
-    console.log('Saving products:', validRows);
+    const newProducts: ProductLimit[] = validRows.map((row, index) => {
+      const isValidProduct = row.productCode.length === 7 && /^\d+$/.test(row.productCode);
+
+      return {
+        id: `new-${Date.now()}-${index}`,
+        productCode: row.productCode,
+        productName: isValidProduct ? `สินค้า ${row.productCode}` : 'Product Name Not Found',
+        limitGroup: row.limitGroup,
+        roundGroup: row.roundGroup,
+        updateDate: new Date().toLocaleString('th-TH'),
+        updateBy: 'current_user',
+        hasError: !isValidProduct,
+        errorMessage: !isValidProduct ? 'Invalid Product Code' : undefined
+      };
+    });
+
+    onSave(newProducts);
     toast.success(`บันทึก ${validRows.length} รายการสำเร็จ`);
+
+    // Reset form
+    setRows([{ id: '1', productCode: '', limitGroup: '', roundGroup: '' }]);
+    setBulkText('');
     onClose();
   };
 

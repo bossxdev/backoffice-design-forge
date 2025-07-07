@@ -7,61 +7,21 @@ import {Badge} from '@/components/ui/badge';
 import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter} from '@/components/ui/dialog';
 import {Eye, Trash2, Search, Edit} from 'lucide-react';
 import {toast} from 'sonner';
+import { ProductLimit } from '@/types/product';
 
-interface ProductLimit {
-  id: string;
-  productCode: string;
-  productName: string;
-  limitGroup: string;
-  roundGroup: string;
-  updateDate: string;
-  updateBy: string;
-  hasError?: boolean;
-  errorMessage?: string;
+interface ProductLimitTableProps {
+  products: ProductLimit[];
+  setProducts: React.Dispatch<React.SetStateAction<ProductLimit[]>>;
 }
 
-const ProductLimitTable = () => {
+const ProductLimitTable = ({ products, setProducts }: ProductLimitTableProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedLimitGroup, setSelectedLimitGroup] = useState('');
   const [selectedRoundGroup, setSelectedRoundGroup] = useState('');
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<ProductLimit | null>(null);
   const [newProductCode, setNewProductCode] = useState('');
-  const [newProductName, setNewProductName] = useState('Product Name Not Found');
-  const [errorMsg] = useState('Invalid Product Code');
-
-  // Mock data with some products having errors
-  const [products, setProducts] = useState<ProductLimit[]>([
-    {
-      id: '1',
-      productCode: '1234567',
-      productName: 'นมยูเอชที รสจืด 1000ml',
-      limitGroup: 'กลุ่ม 1 - จำกัด 4 ชิ้น',
-      roundGroup: 'กลุ่ม 2 - จำกัด 24 ชิ้น',
-      updateDate: '02/05/2025 11:17',
-      updateBy: 'admin1'
-    },
-    {
-      id: '2',
-      productCode: 'INVALID001',
-      productName: newProductName,
-      limitGroup: 'กลุ่ม 2 - จำกัด 24 ชิ้น',
-      roundGroup: 'กลุ่ม 3 - จำกัด 48 ชิ้น',
-      updateDate: '02/05/2025 10:30',
-      updateBy: 'admin2',
-      hasError: true,
-      errorMessage: errorMsg
-    },
-    {
-      id: '3',
-      productCode: '1234569',
-      productName: 'นมยูเอชที รสสตรอเบอร์รี่ 1000ml',
-      limitGroup: 'กลุ่ม 3 - จำกัด 48 ชิ้น',
-      roundGroup: 'ไม่กำหนดกลุ่ม',
-      updateDate: '01/05/2025 16:45',
-      updateBy: 'admin1'
-    }
-  ]);
+  const [newProductName, setNewProductName] = useState('');
 
   const limitGroups = ['กลุ่ม 1 - จำกัด 4 ชิ้น', 'กลุ่ม 2 - จำกัด 24 ชิ้น', 'กลุ่ม 3 - จำกัด 48 ชิ้น', 'ไม่กำหนดกลุ่ม'];
   const roundGroups = ['กลุ่ม 2 - จำกัด 24 ชิ้น', 'กลุ่ม 3 - จำกัด 48 ชิ้น', 'ไม่กำหนดกลุ่ม'];
