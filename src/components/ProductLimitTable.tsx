@@ -39,7 +39,7 @@ const ProductLimitTable = () => {
     {
       id: '3',
       productCode: '1234569',
-      productName: 'นมยูเอชที รสสตรอเบอร์รี่ 1000ml',
+      productName: 'นมยูเอชทีรสสตรอเบอร์รี่ 1000ml',
       limitGroup: 'กลุ่ม 3 - จำกัด 48 ชิ้น',
       roundGroup: 'ไม่กำหนดกลุ่ม',
       updateDate: '01/05/2025 16:45',
@@ -88,7 +88,7 @@ const ProductLimitTable = () => {
             productCode: newProductCode,
             productName: isValidProduct ? `สินค้า ${newProductCode}` : 'Product Name Not Found',
             hasError: !isValidProduct,
-            errorMessage: isValidProduct ? undefined : 'Invalid Product Code',
+            errorMessage: !isValidProduct ? 'Invalid Product Code' : undefined,
             updateDate: new Date().toLocaleString('th-TH'),
             updateBy: 'current_user'
           }
