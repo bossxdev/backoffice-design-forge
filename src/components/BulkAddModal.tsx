@@ -126,6 +126,8 @@ const BulkAddModal = ({ open, onClose, onSave }: BulkAddModalProps) => {
     onClose();
   };
 
+  const bulkAreaPlaceholder = `1234567, กลุ่ม 1 - จำกัด 4 ชิ้น, กลุ่ม 2 - 24 ชิ้น${"\n"}1234568, กลุ่ม 2 - จำกัด 24 ชิ้น, กลุ่ม 3 - จำกัด 48 ชิ้น`
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden">
@@ -252,10 +254,10 @@ const BulkAddModal = ({ open, onClose, onSave }: BulkAddModalProps) => {
                 </label>
                 <div className="mb-2">
                   <Badge variant="secondary">ตัวอย่าง:</Badge>
-                  <code className="ml-2 text-sm">1234567, 1: 4 ชิ้น, 2: 24 ชิ้น</code>
+                  <code className="ml-2 text-sm">1234567, กลุ่ม 1 - จำกัด 4 ชิ้น, กลุ่ม 2 - จำกัด 24 ชิ้น</code>
                 </div>
                 <Textarea
-                  placeholder="1234567, 1: 4 ชิ้น, 2: 24 ชิ้น&#10;1234568, 2: 24 ชิ้น, 3: 48 ชิ้น"
+                  placeholder={bulkAreaPlaceholder}
                   value={bulkText}
                   onChange={(e) => setBulkText(e.target.value)}
                   rows={8}
