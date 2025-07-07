@@ -29,8 +29,8 @@ const BulkAddModal = ({ open, onClose }: BulkAddModalProps) => {
     { id: '1', productCode: '', limitGroup: '', roundGroup: '' }
   ]);
 
-  const limitGroups = ['1: 4 ชิ้น', '2: 24 ชิ้น', '3: 48 ชิ้น'];
-  const roundGroups = ['2: 24 ชิ้น', '3: 48 ชิ้น', 'ไม่กำหนดกลุ่ม'];
+  const limitGroups = ['กลุ่ม 1 - จำกัด 4 ชิ้น', 'กลุ่ม 2 - จำกัด 24 ชิ้น', 'กลุ่ม 3 - จำกัด 48 ชิ้น', 'ไม่กำหนดกลุ่ม'];
+  const roundGroups = ['กลุ่ม 2 - จำกัด 24 ชิ้น', 'กลุ่ม 3 - จำกัด 48 ชิ้น', 'ไม่กำหนดกลุ่ม'];
 
   const addRow = () => {
     const newRow: ProductRow = {
@@ -49,7 +49,7 @@ const BulkAddModal = ({ open, onClose }: BulkAddModalProps) => {
   };
 
   const updateRow = (id: string, field: keyof ProductRow, value: string) => {
-    setRows(rows.map(row => 
+    setRows(rows.map(row =>
       row.id === id ? { ...row, [field]: value } : row
     ));
   };
@@ -67,7 +67,7 @@ const BulkAddModal = ({ open, onClose }: BulkAddModalProps) => {
   const parseBulkText = () => {
     const lines = bulkText.trim().split('\n');
     const newRows: ProductRow[] = [];
-    
+
     lines.forEach((line, index) => {
       const parts = line.split(',').map(part => part.trim());
       if (parts.length >= 3) {
@@ -79,7 +79,7 @@ const BulkAddModal = ({ open, onClose }: BulkAddModalProps) => {
         });
       }
     });
-    
+
     if (newRows.length > 0) {
       setRows(newRows);
       setActiveTab('table');
@@ -90,15 +90,15 @@ const BulkAddModal = ({ open, onClose }: BulkAddModalProps) => {
   };
 
   const handleSave = () => {
-    const validRows = rows.filter(row => 
+    const validRows = rows.filter(row =>
       row.productCode && row.limitGroup && row.roundGroup
     );
-    
+
     if (validRows.length === 0) {
       toast.error('กรุณากรอกข้อมูลให้ครบถ้วน');
       return;
     }
-    
+
     console.log('Saving products:', validRows);
     toast.success(`บันทึก ${validRows.length} รายการสำเร็จ`);
     onClose();
@@ -159,7 +159,7 @@ const BulkAddModal = ({ open, onClose }: BulkAddModalProps) => {
                   <div className="col-span-1 text-sm text-gray-500 text-center">
                     {index + 1}
                   </div>
-                  
+
                   <div className="col-span-3">
                     <Input
                       placeholder="รหัสสินค้า"
@@ -167,7 +167,7 @@ const BulkAddModal = ({ open, onClose }: BulkAddModalProps) => {
                       onChange={(e) => updateRow(row.id, 'productCode', e.target.value)}
                     />
                   </div>
-                  
+
                   <div className="col-span-3">
                     <Select
                       value={row.limitGroup}
@@ -183,7 +183,7 @@ const BulkAddModal = ({ open, onClose }: BulkAddModalProps) => {
                       </SelectContent>
                     </Select>
                   </div>
-                  
+
                   <div className="col-span-3">
                     <Select
                       value={row.roundGroup}
@@ -199,7 +199,7 @@ const BulkAddModal = ({ open, onClose }: BulkAddModalProps) => {
                       </SelectContent>
                     </Select>
                   </div>
-                  
+
                   <div className="col-span-2 flex gap-1">
                     {index === rows.length - 1 && (
                       <Button variant="outline" size="sm" onClick={addRow}>
@@ -207,9 +207,9 @@ const BulkAddModal = ({ open, onClose }: BulkAddModalProps) => {
                       </Button>
                     )}
                     {rows.length > 1 && (
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
+                      <Button
+                        variant="outline"
+                        size="sm"
                         onClick={() => removeRow(row.id)}
                         className="text-red-600"
                       >
@@ -239,7 +239,7 @@ const BulkAddModal = ({ open, onClose }: BulkAddModalProps) => {
                   rows={8}
                 />
               </div>
-              
+
               <Button onClick={parseBulkText} className="w-full">
                 <Upload className="w-4 h-4 mr-2" />
                 นำเข้าข้อมูล
