@@ -7,45 +7,17 @@ import ProductSearchFilters from './ProductSearchFilters';
 import ProductTable from './ProductTable';
 import ProductEditDialog from './ProductEditDialog';
 
-const ProductLimitTable = () => {
+interface ProductLimitTableProps {
+  products: ProductLimit[];
+  setProducts: React.Dispatch<React.SetStateAction<ProductLimit[]>>;
+}
+
+const ProductLimitTable = ({ products, setProducts }: ProductLimitTableProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedLimitGroup, setSelectedLimitGroup] = useState('');
   const [selectedRoundGroup, setSelectedRoundGroup] = useState('');
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<ProductLimit | null>(null);
-
-  // Mock data with some products having errors
-  const [products, setProducts] = useState<ProductLimit[]>([
-    {
-      id: '1',
-      productCode: '1234567',
-      productName: 'นมยูเอชที รสจืด 1000ml',
-      limitGroup: 'กลุ่ม 1 - จำกัด 4 ชิ้น',
-      roundGroup: 'กลุ่ม 2 - จำกัด 24 ชิ้น',
-      updateDate: '02/05/2025 11:17',
-      updateBy: 'admin1'
-    },
-    {
-      id: '2',
-      productCode: 'INVALID001',
-      productName: 'Product Name Not Found',
-      limitGroup: 'กลุ่ม 2 - จำกัด 24 ชิ้น',
-      roundGroup: 'กลุ่ม 3 - จำกัด 48 ชิ้น',
-      updateDate: '02/05/2025 10:30',
-      updateBy: 'admin2',
-      hasError: true,
-      errorMessage: 'Invalid Product Code'
-    },
-    {
-      id: '3',
-      productCode: '1234569',
-      productName: 'นมยูเอชทีรสสตรอเบอร์รี่ 1000ml',
-      limitGroup: 'กลุ่ม 3 - จำกัด 48 ชิ้น',
-      roundGroup: 'ไม่กำหนดกลุ่ม',
-      updateDate: '01/05/2025 16:45',
-      updateBy: 'admin1'
-    }
-  ]);
 
   const limitGroups = ['กลุ่ม 1 - จำกัด 4 ชิ้น', 'กลุ่ม 2 - จำกัด 24 ชิ้น', 'กลุ่ม 3 - จำกัด 48 ชิ้น', 'ไม่กำหนดกลุ่ม'];
   const roundGroups = ['กลุ่ม 2 - จำกัด 24 ชิ้น', 'กลุ่ม 3 - จำกัด 48 ชิ้น', 'ไม่กำหนดกลุ่ม'];

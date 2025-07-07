@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -9,10 +8,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Copy, Trash2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
+import { ProductLimit } from '@/types/product';
 
 interface BulkAddModalProps {
   open: boolean;
   onClose: () => void;
+  onSave: (products: ProductLimit[]) => void;
 }
 
 interface ProductRow {
@@ -22,15 +23,15 @@ interface ProductRow {
   roundGroup: string;
 }
 
-const BulkAddModal = ({ open, onClose }: BulkAddModalProps) => {
+const BulkAddModal = ({ open, onClose, onSave }: BulkAddModalProps) => {
   const [activeTab, setActiveTab] = useState('table');
   const [bulkText, setBulkText] = useState('');
   const [rows, setRows] = useState<ProductRow[]>([
     { id: '1', productCode: '', limitGroup: '', roundGroup: '' }
   ]);
 
-  const limitGroups = ['1: 4 ชิ้น', '2: 24 ชิ้น', '3: 48 ชิ้น'];
-  const roundGroups = ['2: 24 ชิ้น', '3: 48 ชิ้น', 'ไม่กำหนดกลุ่ม'];
+  const limitGroups = ['กลุ่ม 1 - จำกัด 4 ชิ้น', 'กลุ่ม 2 - จำกัด 24 ชิ้น', 'กลุ่ม 3 - จำกัด 48 ชิ้น', 'ไม่กำหนดกลุ่ม'];
+  const roundGroups = ['กลุ่ม 2 - จำกัด 24 ชิ้น', 'กลุ่ม 3 - จำกัด 48 ชิ้น', 'ไม่กำหนดกลุ่ม'];
 
   const addRow = () => {
     const newRow: ProductRow = {
@@ -99,8 +100,29 @@ const BulkAddModal = ({ open, onClose }: BulkAddModalProps) => {
       return;
     }
     
-    console.log('Saving products:', validRows);
+    // Convert rows to ProductLimit format
+    const newProducts: ProductLimit[] = validRows.map((row, index) => {
+      const isValidProduct = row.productCode.length === 7 && /^\d+$/.test(row.productCode);
+      
+      return {
+        id: `new-${Date.now()}-${index}`,
+        productCode: row.productCode,
+        productName: isValidProduct ? `สินค้า ${row.productCode}` : 'Product Name Not Found',
+        limitGroup: row.limitGroup,
+        roundGroup: row.roundGroup,
+        updateDate: new Date().toLocaleString('th-TH'),
+        updateBy: 'current_user',
+        hasError: !isValidProduct,
+        errorMessage: !isValidProduct ? 'Invalid Product Code' : undefined
+      };
+    });
+    
+    onSave(newProducts);
     toast.success(`บันทึก ${validRows.length} รายการสำเร็จ`);
+    
+    // Reset form
+    setRows([{ id: '1', productCode: '', limitGroup: '', roundGroup: '' }]);
+    setBulkText('');
     onClose();
   };
 
@@ -230,10 +252,10 @@ const BulkAddModal = ({ open, onClose }: BulkAddModalProps) => {
                 </label>
                 <div className="mb-2">
                   <Badge variant="secondary">ตัวอย่าง:</Badge>
-                  <code className="ml-2 text-sm">1234567, 1: 4 ชิ้น, 2: 24 ชิ้น</code>
+                  <code className="ml-2 text-sm">1234567, กลุ่ม 1 - จำกัด 4 ชิ้น, กลุ่ม 2 - จำกัด 24 ชิ้น</code>
                 </div>
                 <Textarea
-                  placeholder="1234567, 1: 4 ชิ้น, 2: 24 ชิ้น&#10;1234568, 2: 24 ชิ้น, 3: 48 ชิ้น"
+                  placeholder="1234567, กลุ่ม 1 - จำกัด 4 ชิ้น, กลุ่ม 2 - จำกัด 24 ชิ้น&#10;1234568, กลุ่ม 2 - จำกัด 24 ชิ้น, กลุ่ม 3 - จำกัด 48 ชิ้น"
                   value={bulkText}
                   onChange={(e) => setBulkText(e.target.value)}
                   rows={8}
