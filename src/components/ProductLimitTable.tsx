@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Eye, Trash2, Search, Edit } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -94,8 +93,8 @@ const ProductLimitTable = () => {
       return;
     }
 
-    // Simulate product validation
-    const isValidProduct = newProductCode.length === 7 && !newProductCode.includes('INVALID');
+    // Simulate product validation - consider valid if it's 7 digits and doesn't contain 'INVALID'
+    const isValidProduct = newProductCode.length === 7 && !newProductCode.includes('INVALID') && /^\d+$/.test(newProductCode);
     
     setProducts(prev => prev.map(product => 
       product.id === editingProduct.id 
@@ -253,6 +252,9 @@ const ProductLimitTable = () => {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>แก้ไขรหัสสินค้า</DialogTitle>
+            <DialogDescription>
+              กรุณาใส่รหัสสินค้าที่ถูกต้อง (7 หลัก)
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
