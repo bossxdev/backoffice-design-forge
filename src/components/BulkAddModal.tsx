@@ -6,9 +6,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Copy, Trash2, Upload } from 'lucide-react';
+import { Plus, Copy, Trash2, Upload, FileSpreadsheet } from 'lucide-react';
 import { toast } from 'sonner';
 import { ProductLimit } from '@/types/product';
+import * as XLSX from 'xlsx';
 
 interface BulkAddModalProps {
   open: boolean;
@@ -63,6 +64,67 @@ const BulkAddModal = ({ open, onClose, onSave }: BulkAddModalProps) => {
   const applyRoundGroupToAll = (group: string) => {
     setRows(rows.map(row => ({ ...row, roundGroup: group })));
     toast.success(`ใช้กลุ่มรอบ "${group}" กับทุกรายการแล้ว`);
+  };
+
+  const handleExcelUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+        // Skip header row and process data
+        const excelRows: ProductRow[] = [];
+        for (let i = 1; i < jsonData.length; i++) {
+          const row = jsonData[i] as any[];
+          if (row.length >= 4 && row[0]) {
+            // Map Excel data to our format
+            const productCode = String(row[0]).replace('.0', ''); // Remove .0 from numbers
+            const limitAmount = Number(row[2]) || 0;
+            const roundAmount = Number(row[3]) || 0;
+            
+            // Map amounts to groups
+            let limitGroup = 'ไม่กำหนดกลุ่ม';
+            let roundGroup = 'ไม่กำหนดกลุ่ม';
+            
+            if (limitAmount <= 3) limitGroup = 'กลุ่ม 1 - จำกัด 4 ชิ้น';
+            else if (limitAmount <= 24) limitGroup = 'กลุ่ม 2 - จำกัด 24 ชิ้น';
+            else if (limitAmount <= 48) limitGroup = 'กลุ่ม 3 - จำกัด 48 ชิ้น';
+            
+            if (roundAmount <= 24) roundGroup = 'กลุ่ม 2 - จำกัด 24 ชิ้น';
+            else if (roundAmount <= 48) roundGroup = 'กลุ่ม 3 - จำกัด 48 ชิ้น';
+
+            excelRows.push({
+              id: `excel-${i}`,
+              productCode,
+              limitGroup,
+              roundGroup
+            });
+          }
+        }
+
+        if (excelRows.length > 0) {
+          setRows(excelRows);
+          setActiveTab('table');
+          toast.success(`นำเข้าข้อมูลจาก Excel สำเร็จ ${excelRows.length} รายการ`);
+        } else {
+          toast.error('ไม่พบข้อมูลที่ถูกต้องในไฟล์ Excel');
+        }
+      } catch (error) {
+        console.error('Error parsing Excel file:', error);
+        toast.error('เกิดข้อผิดพลาดในการอ่านไฟล์ Excel');
+      }
+    };
+    reader.readAsArrayBuffer(file);
+    
+    // Reset file input
+    event.target.value = '';
   };
 
   const parseBulkText = () => {
@@ -134,10 +196,60 @@ const BulkAddModal = ({ open, onClose, onSave }: BulkAddModalProps) => {
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="table">เพิ่มแบบตาราง</TabsTrigger>
             <TabsTrigger value="bulk">เพิ่มแบบข้อความ</TabsTrigger>
+            <TabsTrigger value="excel">นำเข้า Excel</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="excel" className="space-y-4">
+            <div className="space-y-4 p-4">
+              <div className="text-center">
+                <FileSpreadsheet className="mx-auto h-12 w-12 text-green-600 mb-4" />
+                <h3 className="text-lg font-medium mb-2">นำเข้าข้อมูลจากไฟล์ Excel</h3>
+                <p className="text-gray-600 mb-4">
+                  เลือกไฟล์ Excel ที่มีข้อมูลสินค้าในรูปแบบที่กำหนด
+                </p>
+              </div>
+              
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
+                <div className="text-center">
+                  <Input
+                    type="file"
+                    accept=".xlsx,.xls"
+                    onChange={handleExcelUpload}
+                    className="hidden"
+                    id="excel-upload"
+                  />
+                  <label
+                    htmlFor="excel-upload"
+                    className="cursor-pointer inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-colors"
+                  >
+                    <Upload className="w-4 h-4" />
+                    เลือกไฟล์ Excel
+                  </label>
+                  <p className="mt-2 text-sm text-gray-500">
+                    รองรับไฟล์ .xlsx และ .xls
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="font-medium text-blue-900 mb-2">รูปแบบข้อมูลที่ต้องการ:</h4>
+                <div className="text-sm text-blue-800 space-y-1">
+                  <p><strong>คอลัมน์ที่ 1:</strong> รหัสสินค้า</p>
+                  <p><strong>คอลัมน์ที่ 2:</strong> ชื่อสินค้า</p>
+                  <p><strong>คอลัมน์ที่ 3:</strong> จำนวนที่ limit ถึงที่, รับร้าน</p>
+                  <p><strong>คอลัมน์ที่ 4:</strong> จำนวนที่ limit จัดส่งตามรอบ</p>
+                  <p><strong>คอลัมน์ที่ 5:</strong> วันที่สร้าง</p>
+                </div>
+                <div className="mt-3 text-xs text-blue-700">
+                  <p>* ระบบจะแปลงจำนวน limit เป็นกลุ่มโดยอัตโนมัติ</p>
+                  <p>* ≤3: กลุ่ม 1, ≤24: กลุ่ม 2, ≤48: กลุ่ม 3</p>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
 
           <TabsContent value="table" className="space-y-4 overflow-auto max-h-[70vh]">
             {/* Quick Actions */}
